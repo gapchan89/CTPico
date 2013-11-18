@@ -6,6 +6,7 @@
 USING_NS_CC;
 
 //King of the world
+//Queen of the world?
 
 AppDelegate::AppDelegate()
 {
