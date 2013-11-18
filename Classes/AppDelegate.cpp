@@ -7,8 +7,11 @@ USING_NS_CC;
 
 //King of the world
 //Queen of the world?
+<<<<<<< HEAD
 
 //TEST TEST
+=======
+>>>>>>> refs/heads/Justin's-Update
 
 AppDelegate::AppDelegate()
 {
