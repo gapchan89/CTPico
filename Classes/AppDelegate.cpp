@@ -2,16 +2,9 @@
 
 #include "cocos2d.h"
 #include "HelloWorldScene.h"
+#include "GameManager.h"
 
 USING_NS_CC;
-
-//King of the world
-//Queen of the world?
-<<<<<<< HEAD
-
-//TEST TEST
-=======
->>>>>>> refs/heads/Justin's-Update
 
 AppDelegate::AppDelegate()
 {
@@ -35,7 +28,7 @@ bool AppDelegate::applicationDidFinishLaunching()
     pDirector->setAnimationInterval(1.0 / 60);
 
     // create a scene. it's an autorelease object
-    CCScene *pScene = HelloWorld::scene();
+    CCScene *pScene = GameManager::scene();
 
     // run
     pDirector->runWithScene(pScene);
