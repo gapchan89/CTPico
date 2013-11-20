@@ -48,6 +48,7 @@ bool GameManager::init()
 
     //Enable touch
     this->setTouchEnabled(true);
+    this->setAccelerometerEnabled(true);
 
     /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
@@ -71,13 +72,13 @@ bool GameManager::init()
 
     // add a label shows "Hello World"
     // create and initialize a label
-    CCLabelTTF* pLabel = CCLabelTTF::create("Catropico! =D", "Thonburi", 34);
+    //CCLabelTTF* pLabel = CCLabelTTF::create("Catropico! =D", "Thonburi", 34);
 
     // ask director the window size
     CCSize size = CCDirector::sharedDirector()->getWinSize();
 
-    pLabel->setPosition( ccp(size.width / 2, size.height - 20) );
-    this->addChild(pLabel, 1);
+    //pLabel->setPosition( ccp(size.width / 2, size.height - 20) );
+    //this->addChild(pLabel, 1);
 
     comboCounter = 0;
     CCLabelTTF* pLabel2 = CCLabelTTF::create("0", "Thonburi", 48);
@@ -99,14 +100,9 @@ void GameManager::loadGame()
 {
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
-	//CCSpriteBatchNode *batchnodes = CCSpriteBatchNode::create("Game/Character/character-run.jpg");
-	//CCSpriteFrame *frame = CCSpriteFrame::create("Game/Character/character-run.jpg", CCRect(0,0,116,140) );
-
+	//================ Character =================
 	CCAnimation *animation = CCAnimation::create();
 
-	// load image file from local file system to CCSpriteFrame, then add into CCAnimation
-	// for (int i = 0; i < 2; i++)
-	// {
 	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(0,100,100,100) );
 	animation->addSpriteFrame(frame);
 
@@ -118,7 +114,6 @@ void GameManager::loadGame()
 
 	frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(300,100,100,100) );
 	animation->addSpriteFrame(frame);
-	// }
 
 	CCSprite* cSprite = CCSprite::createWithSpriteFrame(frame);
 	//CCSprite* cSprite = CCSprite::create("Game/Character/character-run.jpg");
@@ -126,39 +121,15 @@ void GameManager::loadGame()
 	cSprite->setTag(99);
 	this->addChild(cSprite,1);
 
-	myCats = new CCArray;
-
-	/*NinjaCat *cat = NinjaCat::gameSpriteWithFile("Game/Cats/ninja-cat.png");
-	cat->setPosition(ccp(1000,200));
-	this->addChild(cat,1);
-	myCats->addObject(cat);*/
-
-	//Spam cats
-	/*CCSprite* catsprite = CCSprite::create("Game/Cats/ninja-cat.png");
-	catsprite->setPosition(  ccp(size.width/2+200,300) );
-	this->addChild(catsprite,1);
-
-	CCSprite* catsprite2 = CCSprite::create("Game/Cats/ninja-cat.png");
-	catsprite2->setPosition(  ccp(size.width/2+250,250) );
-	// catsprite2->setScale(1.5);
-	this->addChild(catsprite2,1);
-
-	CCSprite* catsprite3 = CCSprite::create("Game/Cats/ninja-cat.png");
-	catsprite3->setPosition(  ccp(size.width/2+330,200) );
-	//catsprite3->setScale(0.7);
-	this->addChild(catsprite3,1);
-
-	CCSprite* catsprite4 = CCSprite::create("Game/Cats/ninja-cat.png");
-	catsprite4->setPosition(  ccp(size.width/2+400,100) );
-	//catsprite4->setScale(0.4);
-	this->addChild(catsprite4,1);*/
-
 	animation->setDelayPerUnit(0.3); // This animation contains 14 frames, will continuous 2.8 seconds.
 	animation->setLoops(10000);
 	animation->setRestoreOriginalFrame(true); // Return to the 1st frame after the 14th frame is played.
 
 	CCAnimate *action = CCAnimate::create(animation);
 	cSprite->runAction(action);  // run action on sprite object
+
+	//============= Cats ===============
+	myCats = new CCArray;
 
 	//========== BACKGROUND IMAGE ==========
 	//Scrolling background images variables (Image width = 950)
@@ -183,6 +154,19 @@ void GameManager::loadGame()
 	bgSprite2->setScale(bgScale);
 	bgSprite2->setTag(1001);
 	this->addChild(bgSprite2, 0);
+
+	//============ UI ==================
+	CCSprite * uiSprite = CCSprite::create("Game/UI/game ui.png");
+	uiSprite->setScale(bgScale);
+	uiSprite->setPosition(ccp(size.width/2, size.height/2));
+	this->addChild(uiSprite, 10);
+
+	skillOn = false;
+	CCSprite * metSprite = CCSprite::create("Game/UI/meteor-01.png");
+	metSprite->setScale(0.3);
+	metSprite->setPosition(ccp(size.width-320,50));
+	metSprite->setTag(950);
+	this->addChild(metSprite,11);
 }
 
 //Update function
@@ -204,8 +188,46 @@ void GameManager::update(float dt)
 	if( bg2Sprite->getPositionX() >= bgEndPosX)
 		bg2Sprite->setPositionX(bgStartPosX);
 
-	//========== COMBO ==========
+	//========== Skill ===========
+	if( skillOn )
+	{
+		//Adjust the meteor based on offsetX, offsetY
+		CCSprite *met = (CCSprite*)this->getChildByTag(1200);
 
+		CCPoint point = met->getPosition();
+		met->setPosition(ccp(point.x + ((accX-offsetX)*5) ,point.y-3));
+
+		//Init world destruction
+		if( point.y < 150 )
+		{
+			skillOn = false;
+			this->removeChildByTag(1200);
+
+			CCObject *cat = NULL;
+			CCARRAY_FOREACH(myCats, cat)
+			{
+				NinjaCat *ncat = dynamic_cast<NinjaCat*>(cat);
+				if( !ncat->returnIsDead() )
+				{
+					ncat->setIsDead(true);
+
+					CCActionInterval* rotate = CCRotateBy::create(0.5f , 150);
+					CCAction *act = CCRepeatForever::create(rotate);
+
+					CCSequence* seq = CCSequence::create(
+							CCMoveBy::create(1,ccp(500,rand()%300+600)),
+							CCCallFuncN::create( this, callfuncN_selector(GameManager::removeCat)),
+							NULL
+					);
+
+					ncat->runAction(act);
+					ncat->runAction(seq);
+				}
+			}
+		}
+	}
+
+	//========== COMBO ==========
 	if( comboOn )
 	{
 		comboTimer += dt;
@@ -319,6 +341,21 @@ void GameManager::ccTouchesBegan(CCSet* touches, CCEvent* event)
 	CCPoint location = touch->getLocationInView();
 	location = CCDirector::sharedDirector()->convertToGL(location);
 
+	CCSprite *metSprite = (CCSprite*)this->getChildByTag(950);
+	if( metSprite->boundingBox().containsPoint(location) && !skillOn )
+	{
+		skillOn = true;
+		offsetX = accX;
+		offsetY = accY;
+
+		CCSprite *meteor = CCSprite::create("Game/Cats/ninja-cat.png");
+		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+		meteor->setPosition(ccp(winSize.width/2,winSize.height+100));
+		meteor->setTag(1200);
+
+		this->addChild(meteor,9);
+	}
+
     for (CCSetIterator it = touches->begin(); it != touches->end(); it++) {
         CCTouch *touch = (CCTouch *)*it;
 		CCBlade *blade = CCBlade::create("Game/streak.png", 4, 50);
@@ -428,6 +465,17 @@ void GameManager::ccTouchesEnded(CCSet* touches, CCEvent* event)
     }
 }
 
+void GameManager::didAccelerate(cocos2d::CCAcceleration* pAccelerationValue)
+{
+      accX = pAccelerationValue->x;                //horizontal acceleration
+      accY = pAccelerationValue->y;                //vertical acceleration
+
+      //CCLog("X: %f   Y: %f",x,y);
+
+      //If you want to move sprite then can use it to change the position..
+      //sprite->setPosition(ccp(sprite->getPosition().x+pAccelerationValue->x*3,sprite->getPosition().y));    //I have not tested it but to move sprite horizontally with some speed like x*6..you can change it as accordingly..
+}
+
 void GameManager::menuCloseCallback(CCObject* pSender)
 {
     CCDirector::sharedDirector()->end();
@@ -440,31 +488,34 @@ void GameManager::menuCloseCallback(CCObject* pSender)
 void GameManager::addCat()
 {
 	//========== ANIMATE IMAGE ==========
-	/*CCAnimation *animation = CCAnimation::create();
+	CCAnimation *catanimation = CCAnimation::create();
 
-	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(0, 0,100,100) );
-	animation->addSpriteFrame(frame);
+	CCSpriteFrame *frame2 = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(0, 0,100,100) );
+	catanimation->addSpriteFrame(frame2);
 
-	frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(100, 0,100,100) );
-	animation->addSpriteFrame(frame);
+	frame2 = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(100, 0,100,100) );
+	catanimation->addSpriteFrame(frame2);
 
-	frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(200, 0,100,100) );
-	animation->addSpriteFrame(frame);
+	frame2 = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(200, 0,100,100) );
+	catanimation->addSpriteFrame(frame2);
 
-	frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(300, 0,100,100) );
-	animation->addSpriteFrame(frame);
+	frame2 = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(300, 0,100,100) );
+	catanimation->addSpriteFrame(frame2);
 
-	CCSprite* cat = CCSprite::createWithSpriteFrame(frame);
-
-    animation->setDelayPerUnit(0.3); // This animation contains 14 frames, will continuous 2.8 seconds.
-	animation->setLoops(10000);
-	animation->setRestoreOriginalFrame(true); // Return to the 1st frame after the 14th frame is played.
-	CCAnimate *action = CCAnimate::create(animation);*/
+	catanimation->setDelayPerUnit(0.2); // This animation contains 14 frames, will continuous 2.8 seconds.
+	catanimation->setLoops(10000);
+	catanimation->setRestoreOriginalFrame(true); // Return to the 1st frame after the 14th frame is played.
 
 	//========== CALCULATE MOVEMENT ==========
 
 	CCPoint charpos = this->getChildByTag(99)->getPosition();
-	NinjaCat *cat = NinjaCat::gameSpriteWithFile("Game/Cats/ninja-cat.png");
+
+	//NinjaCat *cat = NinjaCat::gameSpriteWithFile("Game/Cats/ninja-cat.png");
+	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(0, 0,100,100) );
+	NinjaCat* cat = NinjaCat::gameSpriteWithFrame(frame);
+
+	CCAnimate *action = CCAnimate::create(catanimation);
+	cat->runAction(action);
 
 	// Determine where to spawn the target along the Y axis
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
@@ -501,3 +552,36 @@ void GameManager::spriteMoveFinished(CCNode* sender)
   CCSprite *sprite = (CCSprite *)sender;
   this->removeChild(sprite, true);
 }
+
+
+
+
+
+
+
+
+/// USELESS CODE HERE FOR RFERENCE
+ 	/*NinjaCat *cat = NinjaCat::gameSpriteWithFile("Game/Cats/ninja-cat.png");
+	cat->setPosition(ccp(1000,200));
+	this->addChild(cat,1);
+	myCats->addObject(cat);*/
+
+	//Spam cats
+	/*CCSprite* catsprite = CCSprite::create("Game/Cats/ninja-cat.png");
+	catsprite->setPosition(  ccp(size.width/2+200,300) );
+	this->addChild(catsprite,1);
+
+	CCSprite* catsprite2 = CCSprite::create("Game/Cats/ninja-cat.png");
+	catsprite2->setPosition(  ccp(size.width/2+250,250) );
+	// catsprite2->setScale(1.5);
+	this->addChild(catsprite2,1);
+
+	CCSprite* catsprite3 = CCSprite::create("Game/Cats/ninja-cat.png");
+	catsprite3->setPosition(  ccp(size.width/2+330,200) );
+	//catsprite3->setScale(0.7);
+	this->addChild(catsprite3,1);
+
+	CCSprite* catsprite4 = CCSprite::create("Game/Cats/ninja-cat.png");
+	catsprite4->setPosition(  ccp(size.width/2+400,100) );
+	//catsprite4->setScale(0.4);
+	this->addChild(catsprite4,1);*/

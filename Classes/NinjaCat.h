@@ -25,6 +25,7 @@ public:
 	bool					returnIsDead();
 
 	static NinjaCat*		gameSpriteWithFile(const char* filename);
+	static NinjaCat* 		gameSpriteWithFrame(CCSpriteFrame *frame);
 	virtual void 			setPosition(const CCPoint& pos);
 
 };

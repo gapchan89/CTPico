@@ -31,6 +31,20 @@ bool NinjaCat::returnIsDead() {
 	return isDead;
 }
 
+NinjaCat* NinjaCat::gameSpriteWithFrame(CCSpriteFrame *frame)
+{
+	NinjaCat *cat = new NinjaCat();
+
+	if( cat && cat->initWithSpriteFrame(frame) )
+	{
+		cat->autorelease();
+		return cat;
+	}
+
+	CC_SAFE_DELETE(cat);
+	return NULL;
+}
+
 NinjaCat* NinjaCat::gameSpriteWithFile(const char* filename)
 {
 	NinjaCat *cat = new NinjaCat();

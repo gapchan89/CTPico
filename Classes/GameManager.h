@@ -9,10 +9,18 @@ class GameManager : public cocos2d::CCLayer
 {
 private:
 
-	cocos2d::CCArray*				myCats;
+	//Combo
 	bool							comboOn;
 	float							comboTimer;
 	int								comboCounter;
+
+	//Accelerometer
+	double							offsetX, accX;
+	double							offsetY, accY;
+	bool							skillOn;
+
+	//Cat methods
+	cocos2d::CCArray*				myCats;
 
 	//map update variables
 	int								bgStartPosX, bgEndPosX, bgWidth;
@@ -45,6 +53,8 @@ public:
     virtual void 					ccTouchesBegan(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
     virtual void 					ccTouchesMoved(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
     virtual void 					ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
+
+    virtual void 					didAccelerate(cocos2d::CCAcceleration* pAccelerationValue);
 
     void 							createNewCat();
     void 							removeCat(cocos2d::CCNode* object);
