@@ -14,6 +14,10 @@ private:
 	float							comboTimer;
 	int								comboCounter;
 
+	//map update variables
+	int								bgStartPosX, bgEndPosX, bgWidth;
+	float							bgScale;
+
 	//Update function
 	void 							update(float dt);
 	void 							updateComboCounter();
@@ -44,6 +48,9 @@ public:
 
     void 							createNewCat();
     void 							removeCat(cocos2d::CCNode* object);
+
+    void 							addCat();
+    void							spriteMoveFinished(CCNode* sender);
 };
 
 #endif // __GAMEMANAGER_SCENE_H__

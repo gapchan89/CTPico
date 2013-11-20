@@ -87,11 +87,13 @@ bool GameManager::init()
 
     loadGame();
 
-    this->schedule(schedule_selector(GameManager::createNewCat),3.0f);
+    this->schedule(schedule_selector(GameManager::addCat), 1.0f);
     this->scheduleUpdate();
 
     return true;
 }
+
+
 
 void GameManager::loadGame()
 {
@@ -126,10 +128,10 @@ void GameManager::loadGame()
 
 	myCats = new CCArray;
 
-	NinjaCat *cat = NinjaCat::gameSpriteWithFile("Game/Cats/ninja-cat.png");
+	/*NinjaCat *cat = NinjaCat::gameSpriteWithFile("Game/Cats/ninja-cat.png");
 	cat->setPosition(ccp(1000,200));
 	this->addChild(cat,1);
-	myCats->addObject(cat);
+	myCats->addObject(cat);*/
 
 	//Spam cats
 	/*CCSprite* catsprite = CCSprite::create("Game/Cats/ninja-cat.png");
@@ -158,15 +160,27 @@ void GameManager::loadGame()
 	CCAnimate *action = CCAnimate::create(animation);
 	cSprite->runAction(action);  // run action on sprite object
 
-	CCSprite* bgSprite1 = CCSprite::create("Game/Background/background.jpg");
-	bgSprite1->setPosition( ccp( 640, size.height/2) );
-	bgSprite1->setScale(1.3f);
+	//========== BACKGROUND IMAGE ==========
+	//Scrolling background images variables (Image width = 950)
+	bgScale = size.width / 950;
+
+	float heightScale = size.height/ 547;
+	if(heightScale > bgScale)	bgScale = heightScale;
+
+	bgWidth = 950 * bgScale;
+	bgStartPosX = size.width - bgWidth - bgWidth/2;
+	bgEndPosX = size.width + bgWidth/2;
+
+	//loading background images
+	CCSprite* bgSprite1 = CCSprite::create("Game/Background/bg-01.png");
+	bgSprite1->setPosition( ccp( size.width - bgWidth/2, size.height/2) ); //first image start within screen
+	bgSprite1->setScale(bgScale);
 	bgSprite1->setTag(1000);
 	this->addChild(bgSprite1, 0);
 
-	CCSprite* bgSprite2 = CCSprite::create("Game/Background/background.jpg");
-	bgSprite2->setPosition( ccp( -640 , size.height/2) );
-	bgSprite2->setScale(1.3f);
+	CCSprite* bgSprite2 = CCSprite::create("Game/Background/bg-01.png");
+	bgSprite2->setPosition( ccp( bgStartPosX , size.height/2) ); //second image start outside of screen
+	bgSprite2->setScale(bgScale);
 	bgSprite2->setTag(1001);
 	this->addChild(bgSprite2, 0);
 }
@@ -177,16 +191,20 @@ void GameManager::update(float dt)
 	CCSprite* characterSprite = (CCSprite*)this->getChildByTag(99);
 	//characterSprite->setPosition( ccpAdd( characterSprite->getPosition() , ccp(1,1) ));
 
+	//========== BACKGROUND IMAGE ==========
 	CCSprite* bg1Sprite = (CCSprite*)this->getChildByTag(1000);
 	CCSprite* bg2Sprite = (CCSprite*)this->getChildByTag(1001);
 
 	bg1Sprite->setPosition( ccpAdd(bg1Sprite->getPosition(),ccp(1,0) ) );
 	bg2Sprite->setPosition( ccpAdd(bg2Sprite->getPosition(),ccp(1,0) ) );
 
-	if( bg1Sprite->getPositionX() >= 1920 )
-		bg1Sprite->setPositionX(-640);
-	if( bg2Sprite->getPositionX() >= 1920 )
-		bg2Sprite->setPositionX(-640);
+	//if background outside of screen, reset position
+	if( bg1Sprite->getPositionX() >= bgEndPosX )
+		bg1Sprite->setPositionX(bgStartPosX);
+	if( bg2Sprite->getPositionX() >= bgEndPosX)
+		bg2Sprite->setPositionX(bgStartPosX);
+
+	//========== COMBO ==========
 
 	if( comboOn )
 	{
@@ -417,4 +435,69 @@ void GameManager::menuCloseCallback(CCObject* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
+}
+
+void GameManager::addCat()
+{
+	//========== ANIMATE IMAGE ==========
+	/*CCAnimation *animation = CCAnimation::create();
+
+	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(0, 0,100,100) );
+	animation->addSpriteFrame(frame);
+
+	frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(100, 0,100,100) );
+	animation->addSpriteFrame(frame);
+
+	frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(200, 0,100,100) );
+	animation->addSpriteFrame(frame);
+
+	frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(300, 0,100,100) );
+	animation->addSpriteFrame(frame);
+
+	CCSprite* cat = CCSprite::createWithSpriteFrame(frame);
+
+    animation->setDelayPerUnit(0.3); // This animation contains 14 frames, will continuous 2.8 seconds.
+	animation->setLoops(10000);
+	animation->setRestoreOriginalFrame(true); // Return to the 1st frame after the 14th frame is played.
+	CCAnimate *action = CCAnimate::create(animation);*/
+
+	//========== CALCULATE MOVEMENT ==========
+
+	CCPoint charpos = this->getChildByTag(99)->getPosition();
+	NinjaCat *cat = NinjaCat::gameSpriteWithFile("Game/Cats/ninja-cat.png");
+
+	// Determine where to spawn the target along the Y axis
+	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+	int minY = cat->getContentSize().height/2;
+	int maxY = winSize.height - 170 - cat->getContentSize().height/2;	// -170 for estimated building height
+	int rangeY = maxY - minY;
+	// srand( TimGetTicks() );
+	int actualY = ( rand() % rangeY ) + minY;
+
+	// Create the target slightly off-screen along the right edge,
+	// and along a random position along the Y axis as calculated
+	cat->setPosition(ccp(winSize.width + (cat->getContentSize().width/2), actualY) );
+	this->addChild(cat, 1);
+	myCats->addObject(cat);
+
+	// Determine speed of the target
+	int minDuration = (int)3.0;
+	int maxDuration = (int)5.0;
+	int rangeDuration = maxDuration - minDuration;
+
+	// srand( TimGetTicks() );
+	int actualDuration = ( rand() % rangeDuration ) + minDuration;
+
+	// Create the actions
+	CCFiniteTimeAction* actionMoveBy = CCMoveBy::create( (float)actualDuration, ccp(-650,0) );
+	CCFiniteTimeAction* actionMove = CCMoveTo::create( 1.5, charpos );
+	CCFiniteTimeAction* actionMoveDone = CCCallFuncN::create( this, callfuncN_selector(GameManager::spriteMoveFinished));
+	cat->runAction( CCSequence::create(actionMoveBy, actionMove, actionMoveDone, NULL) );
+}
+
+// cpp with cocos2d-x
+void GameManager::spriteMoveFinished(CCNode* sender)
+{
+  CCSprite *sprite = (CCSprite *)sender;
+  this->removeChild(sprite, true);
 }
