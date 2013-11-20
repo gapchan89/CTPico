@@ -193,15 +193,29 @@ void GameManager::update(float dt)
 	{
 		//Adjust the meteor based on offsetX, offsetY
 		CCSprite *met = (CCSprite*)this->getChildByTag(1200);
+		CCSprite *crosshair = (CCSprite*)this->getChildByTag(1201);
 
 		CCPoint point = met->getPosition();
-		met->setPosition(ccp(point.x + ((accX-offsetX)*5) ,point.y-3));
+		float crosshairY = crosshair->getPositionY();
+		met->setPosition(ccp(point.x + ((accX-offsetX)*8) , point.y - 4 ));
+		crosshair->setPosition(ccp(point.x + ((accX-offsetX)*8) , crosshairY ));
+
+		/*CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+		float maxX = winSize.height - met->getContentSize().width/2;
+		float minX = met->getContentSize().width/2;
+
+		float diff = (accX * dt);
+		float newX = met->getPosition().x + diff;
+		newX = MIN(MAX(newX, minX), maxX);
+		met->setPosition(ccp(newX , met->getPosition().y - 4 ));
+		crosshair->setPosition(ccp(newX , crosshair->getPosition().y ));*/
 
 		//Init world destruction
-		if( point.y < 150 )
+		if( point.y < 200 )
 		{
 			skillOn = false;
 			this->removeChildByTag(1200);
+			this->removeChildByTag(1201);
 
 			CCObject *cat = NULL;
 			CCARRAY_FOREACH(myCats, cat)
@@ -344,16 +358,48 @@ void GameManager::ccTouchesBegan(CCSet* touches, CCEvent* event)
 	CCSprite *metSprite = (CCSprite*)this->getChildByTag(950);
 	if( metSprite->boundingBox().containsPoint(location) && !skillOn )
 	{
+		//========= METEOR FALL ===========
 		skillOn = true;
 		offsetX = accX;
 		offsetY = accY;
 
-		CCSprite *meteor = CCSprite::create("Game/Cats/ninja-cat.png");
+		CCAnimation *skillAnimation = CCAnimation::create();
+
+		CCSpriteFrame *skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(0, 0,80,94) );
+		skillAnimation->addSpriteFrame(skillFrame);
+
+		skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(80, 0,80,94) );
+		skillAnimation->addSpriteFrame(skillFrame);
+
+		skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(160, 0,80,94) );
+		skillAnimation->addSpriteFrame(skillFrame);
+
+		skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(240, 0,80,94) );
+		skillAnimation->addSpriteFrame(skillFrame);
+
+		skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(320, 0,80,94) );
+				skillAnimation->addSpriteFrame(skillFrame);
+
+		skillAnimation->setDelayPerUnit(0.1); // This animation contains 14 frames, will continuous 2.8 seconds.
+		skillAnimation->setLoops(10000);
+		skillAnimation->setRestoreOriginalFrame(true); // Return to the 1st frame after the 14th frame is played.
+
+		CCSprite* meteor = CCSprite::createWithSpriteFrame(skillFrame);
+		CCAnimate *action = CCAnimate::create(skillAnimation);
+		meteor->runAction(action);  // run action on sprite object
+
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 		meteor->setPosition(ccp(winSize.width/2,winSize.height+100));
 		meteor->setTag(1200);
 
 		this->addChild(meteor,9);
+
+		//=========== CROSSHAIR ========
+		CCSprite *crosshair = CCSprite::create("Game/Skill/crosshair.png");
+		crosshair->setPosition(ccp(winSize.width/2,200));
+		crosshair->setTag(1201);
+
+		this->addChild(crosshair,10);
 	}
 
     for (CCSetIterator it = touches->begin(); it != touches->end(); it++) {
@@ -469,6 +515,22 @@ void GameManager::didAccelerate(cocos2d::CCAcceleration* pAccelerationValue)
 {
       accX = pAccelerationValue->x;                //horizontal acceleration
       accY = pAccelerationValue->y;                //vertical acceleration
+
+      /*
+      #define KFILTERINGFACTOR 0.1
+	  #define KRESTACCELX -0.6
+	  #define KSHIPMAXPOINTSPERSEC (winSize.height*0.5)
+	  #define KMAXDIFFX 0.2
+
+      double rollingX;
+
+      pAccelerationValue->y = pAccelerationValue->x;
+      rollingX = (pAccelerationValue->y * KFILTERINGFACTOR) + (rollingX * (1.0 - KFILTERINGFACTOR));
+      float accelX = pAccelerationValue->y - rollingX;
+      CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+      float accelDiff = accelX - KRESTACCELX;
+      float accelFraction = accelDiff / KMAXDIFFX;
+      accX = KSHIPMAXPOINTSPERSEC * accelFraction;*/
 
       //CCLog("X: %f   Y: %f",x,y);
 
