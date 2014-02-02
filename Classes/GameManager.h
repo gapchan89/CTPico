@@ -4,10 +4,20 @@
 #include "cocos2d.h"
 
 class CCBlade;
+class Character;
+class GameMap;
 
 class GameManager : public cocos2d::CCLayer
 {
 private:
+
+	Character*						myCharacter;
+	//CatsManager*					myCatsManager;
+	GameMap*						myMap;
+	//Skills*						mySkills;
+	//Level							myLevel;
+	//int							chargePoints
+	//int							currentChain
 
 	//Combo
 	bool							comboOn;
@@ -19,10 +29,10 @@ private:
 	double							offsetY, accY;
 	bool							skillOn;
 
-	//Cat methods
+	//Cat methods >>TEMP
 	cocos2d::CCArray*				myCats;
 
-	//map update variables
+	//map update variables //TEMP
 	int								bgStartPosX, bgEndPosX, bgWidth;
 	float							bgScale;
 
@@ -30,6 +40,8 @@ private:
 	void 							update(float dt);
 	void 							updateComboCounter();
     std::map< cocos2d::CCTouch *, CCBlade * >  _map;
+
+    void							keyBackClicked(); //For back key button
 
 public:
 	GameManager(void);
