@@ -8,10 +8,14 @@ LOCAL_MODULE_FILENAME := libgame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
+				   ../../Classes/Cats/CatsManager.cpp \
+				   ../../Classes/Character/Character.cpp \
+				   ../../Classes/Character/CharacterAI.cpp \
 				   ../../Classes/Supporting/CCBlade.cpp \
 				   ../../Classes/GameManager.cpp \
                    ../../Classes/HelloWorldScene.cpp \
 				   ../../Classes/NinjaCat.cpp \
+				   ../../Classes/Map/GameMap.cpp \
 			   
                    
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes                   

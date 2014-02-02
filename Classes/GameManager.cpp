@@ -4,6 +4,9 @@
 #include "NinjaCat.h"
 #include "Supporting/CCBlade.h"
 
+#include "Character/Character.h"
+#include "Map/GameMap.h"
+
 using namespace cocos2d;
 using namespace CocosDenshion;
 
@@ -34,6 +37,9 @@ GameManager::~GameManager()
 		myCats->release();
 		myCats = NULL;
 	}
+
+	delete myMap;
+	myMap = NULL;
 }
 
 // on "init" you need to initialize your instance
@@ -62,33 +68,18 @@ bool GameManager::init()
                                         menu_selector(GameManager::menuCloseCallback) );
     pCloseItem->setPosition( ccp(CCDirector::sharedDirector()->getWinSize().width - 20, 20) );
 
-    // create menu, it's an autorelease object
+    // create menu, it's an autorelease object TEMP ITEM
     CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
     pMenu->setPosition( CCPointZero );
     this->addChild(pMenu, 1);
 
-    /////////////////////////////
-    // 3. add your codes below...
-
-    // add a label shows "Hello World"
-    // create and initialize a label
-    //CCLabelTTF* pLabel = CCLabelTTF::create("Catropico! =D", "Thonburi", 34);
-
     // ask director the window size
-    CCSize size = CCDirector::sharedDirector()->getWinSize();
-
-    //pLabel->setPosition( ccp(size.width / 2, size.height - 20) );
-    //this->addChild(pLabel, 1);
-
-    comboCounter = 0;
-    CCLabelTTF* pLabel2 = CCLabelTTF::create("0", "Thonburi", 48);
-    pLabel2->setTag(30);
-    pLabel2->setPosition( ccp(40, size.height - 50) );
-    this->addChild(pLabel2, 1);
+    //CCSize size = CCDirector::sharedDirector()->getWinSize();
 
     loadGame();
 
     this->schedule(schedule_selector(GameManager::addCat), 1.0f);
+    this->setKeypadEnabled(true); //enable for backkey button
     this->scheduleUpdate();
 
     return true;
@@ -100,62 +91,20 @@ void GameManager::loadGame()
 {
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
+	//================ MAP ====================
+	myMap = new GameMap(CCString::create("Game/Background/bg-01.png"), this);
+
 	//================ Character =================
-	CCAnimation *animation = CCAnimation::create();
-
 	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(0,100,100,100) );
-	animation->addSpriteFrame(frame);
+	myCharacter = Character::gameSpriteWithFrame(frame);
+	this->addChild(myCharacter,1);
 
-	frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(100,100,100,100) );
-	animation->addSpriteFrame(frame);
-
-	frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(200,100,100,100) );
-	animation->addSpriteFrame(frame);
-
-	frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(300,100,100,100) );
-	animation->addSpriteFrame(frame);
-
-	CCSprite* cSprite = CCSprite::createWithSpriteFrame(frame);
-	//CCSprite* cSprite = CCSprite::create("Game/Character/character-run.jpg");
-	cSprite->setPosition(  ccp(size.width/2-200, size.height/2-200) );
-	cSprite->setTag(99);
-	this->addChild(cSprite,1);
-
-	animation->setDelayPerUnit(0.3); // This animation contains 14 frames, will continuous 2.8 seconds.
-	animation->setLoops(10000);
-	animation->setRestoreOriginalFrame(true); // Return to the 1st frame after the 14th frame is played.
-
-	CCAnimate *action = CCAnimate::create(animation);
-	cSprite->runAction(action);  // run action on sprite object
-
-	//============= Cats ===============
+	//============= Cats =============== to be changed to catsmanager
 	myCats = new CCArray;
 
-	//========== BACKGROUND IMAGE ==========
+	//============ UI ================== have to put this else where i think
 	//Scrolling background images variables (Image width = 950)
-	bgScale = size.width / 950;
-
-	float heightScale = size.height/ 547;
-	if(heightScale > bgScale)	bgScale = heightScale;
-
-	bgWidth = 950 * bgScale;
-	bgStartPosX = size.width - bgWidth - bgWidth/2;
-	bgEndPosX = size.width + bgWidth/2;
-
-	//loading background images
-	CCSprite* bgSprite1 = CCSprite::create("Game/Background/bg-01.png");
-	bgSprite1->setPosition( ccp( size.width - bgWidth/2, size.height/2) ); //first image start within screen
-	bgSprite1->setScale(bgScale);
-	bgSprite1->setTag(1000);
-	this->addChild(bgSprite1, 0);
-
-	CCSprite* bgSprite2 = CCSprite::create("Game/Background/bg-01.png");
-	bgSprite2->setPosition( ccp( bgStartPosX , size.height/2) ); //second image start outside of screen
-	bgSprite2->setScale(bgScale);
-	bgSprite2->setTag(1001);
-	this->addChild(bgSprite2, 0);
-
-	//============ UI ==================
+	bgScale = size.width / 950; // temp value for uiSprite value
 	CCSprite * uiSprite = CCSprite::create("Game/UI/game ui.png");
 	uiSprite->setScale(bgScale);
 	uiSprite->setPosition(ccp(size.width/2, size.height/2));
@@ -167,41 +116,53 @@ void GameManager::loadGame()
 	metSprite->setPosition(ccp(size.width-320,50));
 	metSprite->setTag(950);
 	this->addChild(metSprite,11);
+
+    //================ COMBO ===================
+    comboCounter = 0;
+    CCLabelTTF* pLabel2 = CCLabelTTF::create("0", "Thonburi", 48);
+    pLabel2->setTag(30);
+    pLabel2->setPosition( ccp(40, size.height - 50) );
+    this->addChild(pLabel2, 1);
+
 }
 
 //Update function
 void GameManager::update(float dt)
 {
-	CCSprite* characterSprite = (CCSprite*)this->getChildByTag(99);
-	//characterSprite->setPosition( ccpAdd( characterSprite->getPosition() , ccp(1,1) ));
+	//============= CHARACTER =================
+	myCharacter->update(dt);
 
-	//========== BACKGROUND IMAGE ==========
-	CCSprite* bg1Sprite = (CCSprite*)this->getChildByTag(1000);
-	CCSprite* bg2Sprite = (CCSprite*)this->getChildByTag(1001);
-
-	bg1Sprite->setPosition( ccpAdd(bg1Sprite->getPosition(),ccp(1,0) ) );
-	bg2Sprite->setPosition( ccpAdd(bg2Sprite->getPosition(),ccp(1,0) ) );
-
-	//if background outside of screen, reset position
-	if( bg1Sprite->getPositionX() >= bgEndPosX )
-		bg1Sprite->setPositionX(bgStartPosX);
-	if( bg2Sprite->getPositionX() >= bgEndPosX)
-		bg2Sprite->setPositionX(bgStartPosX);
+	//============= MAP =====================
+	myMap->update(dt);
 
 	//========== Skill ===========
 	if( skillOn )
 	{
 		//Adjust the meteor based on offsetX, offsetY
 		CCSprite *met = (CCSprite*)this->getChildByTag(1200);
+		CCSprite *crosshair = (CCSprite*)this->getChildByTag(1201);
 
 		CCPoint point = met->getPosition();
-		met->setPosition(ccp(point.x + ((accX-offsetX)*5) ,point.y-3));
+		float crosshairY = crosshair->getPositionY();
+		met->setPosition(ccp(point.x + ((accX-offsetX)*8) , point.y - 4 ));
+		crosshair->setPosition(ccp(point.x + ((accX-offsetX)*8) , crosshairY ));
+
+		/*CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+		float maxX = winSize.height - met->getContentSize().width/2;
+		float minX = met->getContentSize().width/2;
+
+		float diff = (accX * dt);
+		float newX = met->getPosition().x + diff;
+		newX = MIN(MAX(newX, minX), maxX);
+		met->setPosition(ccp(newX , met->getPosition().y - 4 ));
+		crosshair->setPosition(ccp(newX , crosshair->getPosition().y ));*/
 
 		//Init world destruction
-		if( point.y < 150 )
+		if( point.y < 200 )
 		{
 			skillOn = false;
 			this->removeChildByTag(1200);
+			this->removeChildByTag(1201);
 
 			CCObject *cat = NULL;
 			CCARRAY_FOREACH(myCats, cat)
@@ -278,7 +239,7 @@ void GameManager::updateComboCounter()
 
 void GameManager::createNewCat()
 {
-	CCPoint charpos = this->getChildByTag(99)->getPosition();
+	CCPoint charpos = ccp(0,0);//this->getChildByTag(99)->getPosition();
 
 	//Formation
 	if( rand()%2 == 0 )
@@ -344,16 +305,48 @@ void GameManager::ccTouchesBegan(CCSet* touches, CCEvent* event)
 	CCSprite *metSprite = (CCSprite*)this->getChildByTag(950);
 	if( metSprite->boundingBox().containsPoint(location) && !skillOn )
 	{
+		//========= METEOR FALL ===========
 		skillOn = true;
 		offsetX = accX;
 		offsetY = accY;
 
-		CCSprite *meteor = CCSprite::create("Game/Cats/ninja-cat.png");
+		CCAnimation *skillAnimation = CCAnimation::create();
+
+		CCSpriteFrame *skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(0, 0,80,94) );
+		skillAnimation->addSpriteFrame(skillFrame);
+
+		skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(80, 0,80,94) );
+		skillAnimation->addSpriteFrame(skillFrame);
+
+		skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(160, 0,80,94) );
+		skillAnimation->addSpriteFrame(skillFrame);
+
+		skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(240, 0,80,94) );
+		skillAnimation->addSpriteFrame(skillFrame);
+
+		skillFrame = CCSpriteFrame::create("Game/Skill/meteor.png", CCRect(320, 0,80,94) );
+				skillAnimation->addSpriteFrame(skillFrame);
+
+		skillAnimation->setDelayPerUnit(0.1); // This animation contains 14 frames, will continuous 2.8 seconds.
+		skillAnimation->setLoops(10000);
+		skillAnimation->setRestoreOriginalFrame(true); // Return to the 1st frame after the 14th frame is played.
+
+		CCSprite* meteor = CCSprite::createWithSpriteFrame(skillFrame);
+		CCAnimate *action = CCAnimate::create(skillAnimation);
+		meteor->runAction(action);  // run action on sprite object
+
 		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 		meteor->setPosition(ccp(winSize.width/2,winSize.height+100));
 		meteor->setTag(1200);
 
 		this->addChild(meteor,9);
+
+		//=========== CROSSHAIR ========
+		CCSprite *crosshair = CCSprite::create("Game/Skill/crosshair.png");
+		crosshair->setPosition(ccp(winSize.width/2,200));
+		crosshair->setTag(1201);
+
+		this->addChild(crosshair,10);
 	}
 
     for (CCSetIterator it = touches->begin(); it != touches->end(); it++) {
@@ -370,9 +363,11 @@ void GameManager::ccTouchesBegan(CCSet* touches, CCEvent* event)
 		blade->push(point);
 	}
 
-	CCSprite* charc = (CCSprite*)this->getChildByTag(99);
-	charc->runAction( CCMoveTo::create(1,ccp( rand()%100 + 200 , rand()%200 + 50 )));
+    //================= CHARACTER =========================
+	//CCSprite* charc = (CCSprite*)this->getChildByTag(99);
+	//charc->runAction( CCMoveTo::create(1,ccp( rand()%100 + 200 , rand()%200 + 50 )));
 
+	//================== CATS ==============================
 	CCObject *cat = NULL;
 	CCARRAY_FOREACH(myCats, cat)
 	{
@@ -405,8 +400,6 @@ void GameManager::ccTouchesBegan(CCSet* touches, CCEvent* event)
 
 void GameManager::ccTouchesMoved(CCSet* touches, CCEvent* event)
 {
-	CCSprite* characterSprite = (CCSprite*)this->getChildByTag(99);
-
 	CCTouch* touch = (CCTouch*)(touches->anyObject());
 	CCPoint location = touch->getLocationInView();
 	location = CCDirector::sharedDirector()->convertToGL(location);
@@ -470,6 +463,22 @@ void GameManager::didAccelerate(cocos2d::CCAcceleration* pAccelerationValue)
       accX = pAccelerationValue->x;                //horizontal acceleration
       accY = pAccelerationValue->y;                //vertical acceleration
 
+      /*
+      #define KFILTERINGFACTOR 0.1
+	  #define KRESTACCELX -0.6
+	  #define KSHIPMAXPOINTSPERSEC (winSize.height*0.5)
+	  #define KMAXDIFFX 0.2
+
+      double rollingX;
+
+      pAccelerationValue->y = pAccelerationValue->x;
+      rollingX = (pAccelerationValue->y * KFILTERINGFACTOR) + (rollingX * (1.0 - KFILTERINGFACTOR));
+      float accelX = pAccelerationValue->y - rollingX;
+      CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+      float accelDiff = accelX - KRESTACCELX;
+      float accelFraction = accelDiff / KMAXDIFFX;
+      accX = KSHIPMAXPOINTSPERSEC * accelFraction;*/
+
       //CCLog("X: %f   Y: %f",x,y);
 
       //If you want to move sprite then can use it to change the position..
@@ -508,7 +517,7 @@ void GameManager::addCat()
 
 	//========== CALCULATE MOVEMENT ==========
 
-	CCPoint charpos = this->getChildByTag(99)->getPosition();
+	CCPoint charpos = ccp(0,0);//this->getChildByTag(99)->getPosition();
 
 	//NinjaCat *cat = NinjaCat::gameSpriteWithFile("Game/Cats/ninja-cat.png");
 	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(0, 0,100,100) );
@@ -551,6 +560,15 @@ void GameManager::spriteMoveFinished(CCNode* sender)
 {
   CCSprite *sprite = (CCSprite *)sender;
   this->removeChild(sprite, true);
+}
+
+void GameManager::keyBackClicked()
+{
+	CCDirector::sharedDirector()->end();
+
+	#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+		exit(0);
+	#endif
 }
 
 
