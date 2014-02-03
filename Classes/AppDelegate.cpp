@@ -2,13 +2,9 @@
 
 #include "cocos2d.h"
 #include "HelloWorldScene.h"
+#include "GameManager.h"
 
 USING_NS_CC;
-
-//King of the world
-//Queen of the world?
-
-//TEST TEST
 
 AppDelegate::AppDelegate()
 {
@@ -26,13 +22,13 @@ bool AppDelegate::applicationDidFinishLaunching()
     pDirector->setOpenGLView(CCEGLView::sharedOpenGLView());
 
     // turn on display FPS
-    pDirector->setDisplayStats(true);
+    pDirector->setDisplayStats(false);
 
     // set FPS. the default value is 1.0/60 if you don't call this
     pDirector->setAnimationInterval(1.0 / 60);
 
     // create a scene. it's an autorelease object
-    CCScene *pScene = HelloWorld::scene();
+    CCScene *pScene = GameManager::scene();
 
     // run
     pDirector->runWithScene(pScene);
