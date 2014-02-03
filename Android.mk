@@ -9,6 +9,7 @@ LOCAL_MODULE_FILENAME := libgame
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
 				   ../../Classes/Cats/CatsManager.cpp \
+				   ../../Classes/Cats/BaseCat.cpp \
 				   ../../Classes/Character/Character.cpp \
 				   ../../Classes/Character/CharacterAI.cpp \
 				   ../../Classes/Supporting/CCBlade.cpp \
