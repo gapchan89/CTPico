@@ -1,15 +1,18 @@
-#include "Character.h"
 #include "EnumLevelType.h"
 #include "Map/GameMap.h"
+#include "Character.h"
+
 //#include "SimpleAudioEngine.h"
 
 using namespace cocos2d;
 //using namespace CocosDenshion;
 
+//===== CONSTRUCTOR =====
 Character::Character()
 {
 
 }
+
 Character::Character(GameMap* map)
 {
 	// new CharAI(this, map)
@@ -27,11 +30,13 @@ Character::Character(GameMap* map)
 	_vector = ccp(0,0);
 }
 
+//===== DESTRUCTOR =====
 Character::~Character(void)
 {
 
 }
 
+//===== FUNCTIONS =====
 Character* Character::gameSpriteWithFrame(CCSpriteFrame *frame)
 {
 	Character *c = new Character();
@@ -74,30 +79,6 @@ void Character::setupSprite()
 
 	CCAnimate *action = CCAnimate::create(animation);
 	this->runAction(action);
-
-	/*this = CCAnimation::create();
-
-	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(0,100,100,100) );
-	this->addSpriteFrame(frame);
-
-	frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(100,100,100,100) );
-	this->addSpriteFrame(frame);
-
-	frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(200,100,100,100) );
-	this->addSpriteFrame(frame);
-
-	frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(300,100,100,100) );
-	this->addSpriteFrame(frame);
-
-	charSprite = CCSprite::createWithSpriteFrame(frame);
-	charSprite->setPosition(  ccp(size.width/2-100, size.height/2-100) );
-
-	this->setDelayPerUnit(0.3); // This animation contains 14 frames, will continuous 2.8 seconds.
-	this->setLoops(10000);
-	this->setRestoreOriginalFrame(true); // Return to the 1st frame after the 14th frame is played.
-
-	CCAnimate *action = CCAnimate::create(this);
-	charSprite->runAction(action);  // run action on sprite object*/
 }
 
 //void Character::setupAI(LevelMode levelMode) //TOFIX - Change LevelType to LevelMode
@@ -122,9 +103,18 @@ void Character::update(float timeDiff)
 	
 void Character::setPosition(const CCPoint& pos) 
 {
-	this->setPosition(pos);
+	CCSprite::setPosition(pos);
 	if (!_nextPosition.equals(pos)) 
 	{
 		_nextPosition = pos;
 	}
 }
+
+CCRect Character::getRect()
+{
+	return CCRectMake(this->getPosition().x - (this->getContentSize().width/2),
+						this->getPosition().y - (this->getContentSize().height/2),
+						this->getContentSize().width,
+						this->getContentSize().height);
+}
+
