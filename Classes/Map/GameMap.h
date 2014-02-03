@@ -1,5 +1,5 @@
 #ifndef _MAP_H_
-#define _MAP_H
+#define _MAP_H_
 
 /*
 *  Map.h
@@ -10,6 +10,7 @@
  *
  */
 #include "cocos2d.h"
+#include "EnumCharacterState.h"
 
 class GameManager;
 
@@ -52,11 +53,12 @@ public:
 	//===== FUNCTIONS =====
 	void update(float xSpeed);
 	bool checkCollision(CCPoint point);
-	float getNextGrid(bool isObstacle, float yCoord);
+	EnumCharacterState getNextGrid(float yCoord, bool isObstacle=false);
 	
 
 	//===== GETTERS =====
 	float getScaleFactor(){return _scaleFactor;}
+	int getPixelsPerGrid() {return _pixelsPerGrid; }
 };
 
 #endif 
