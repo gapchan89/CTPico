@@ -115,7 +115,7 @@ bool GameMap::checkCollision(CCPoint point)
 				the current yCoord the function caller is at
     @result		returns a y coordinate. if isObstacle = true, spawns an obstacle at the y coordinate given
  */
-float GameMap::getNextGrid(bool isObstacle, float yCoord)
+EnumCharacterState GameMap::getNextGrid(float yCoord, bool isObstacle)
 {
 	if (isObstacle)
 	{
@@ -131,7 +131,7 @@ float GameMap::getNextGrid(bool isObstacle, float yCoord)
 		_obstacles->addObject(obstacleSprite);
 
 		//return same ycoord as before
-		return yCoord; //move straight into obstacle
+		return RUN; //move straight into obstacle
 	}
 	else
 	{
@@ -140,11 +140,11 @@ float GameMap::getNextGrid(bool isObstacle, float yCoord)
 
 		//return yCoord accordingly
 		if (direction == 0) //straight
-			return yCoord;
+			return RUN;
 		else if (direction == 1) //up
-			return yCoord - _pixelsPerGrid;
+			return RUNUP;
 		else //down
-			return yCoord + _pixelsPerGrid;
+			return RUNDOWN;
 	}
 }
 

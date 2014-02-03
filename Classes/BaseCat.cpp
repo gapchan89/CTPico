@@ -18,7 +18,7 @@ BaseCat::BaseCat(bool hasSkill)
 	_hasSkill = hasSkill;
 	_skillReady = true;
 	_speedMultiplier = 1.0;
-	_catState = CHASE;
+	_catState = CAT_CHASE;
 
 	//load sprites and animation
 	loadSprite();
@@ -78,7 +78,7 @@ void BaseCat::attack(float timeDiff, Character* charRef)
 		//reduce character health
 		charRef->reduceHealth(BASE_DAMAGE);
 		//delete this cat (mark for deletion)
-		_catState = DEAD;
+		_catState = CAT_DEAD;
 	}
 }
 
@@ -97,7 +97,7 @@ void BaseCat::move(float timeDiff, GameMap* mapRef)
 	this->setPositionX(this->getPositionX() - (_speedX * timeDiff) * _speedMultiplier);
 
 	//current state is jumping (mid air)
-	if (_catState = CHASE_JUMP)
+	if (_catState = CAT_CHASE_JUMP)
 	{
 		//update movement
 		this->setPositionY(this->getPositionY() + (_speedY * timeDiff) * _speedMultiplier);
@@ -111,13 +111,13 @@ void BaseCat::move(float timeDiff, GameMap* mapRef)
 			this->setPositionY(_floorY);
 			_speedY = -_speedY;
 			//set state back to normal running
-			_catState = CHASE;
+			_catState = CAT_CHASE;
 		}
 	}
 
 	//if collided with obstacle
 	if (mapRef->checkCollision(this->getPosition()))
-		_catState = CHASE_JUMP;
+		_catState = CAT_CHASE_JUMP;
 }
 
 /*!
@@ -164,28 +164,28 @@ void BaseCat::update(float timeDiff, GameMap* mapRef, Character* charRef)
 	switch(_catState)
 	{
 		//cat dead
-		case DEAD:
+		case CAT_DEAD:
 			return;
 
 		//move
-		case CHASE:
-		case CHASE_JUMP:
+		case CAT_CHASE:
+		case CAT_CHASE_JUMP:
 			move(timeDiff, mapRef);
 			break;
 
 		//stop
-		case STOP:
+		case CAT_STOP:
 			//stop the cat?
 			//TODO:
 			break;
 
 		//attack
-		case ATTACK:
+		case CAT_ATTACK:
 			attack(timeDiff, charRef);
 			break;
 
 		//skill
-		case SKILL:
+		case CAT_SKILL:
 			useSkill(timeDiff);
 			break;
 	}
@@ -203,7 +203,7 @@ void BaseCat::reduceHealth(int healthReduction)
 	_health -= healthReduction;
 
 	if (_health <= 0)
-		_catState = DEAD;
+		_catState = CAT_DEAD;
 }
 
 
@@ -266,7 +266,7 @@ bool BaseCat::isClicked()
 
 bool BaseCat::isDead()
 {
-	return _catState == DEAD;
+	return _catState == CAT_DEAD;
 }
 
 CCRect BaseCat::getRect()
@@ -291,7 +291,7 @@ void BaseCat::setIsClicked(bool clicked)
 void BaseCat::setIsDead(bool dead)
 {
 	if (dead)
-		_catState = DEAD;
+		_catState = CAT_DEAD;
 	else
-		_catState = CHASE;
+		_catState = CAT_CHASE;
 }
