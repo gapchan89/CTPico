@@ -13,11 +13,11 @@
 enum EnumCatState
 {
 	CHASE,
-	CHASEUP,
-	CHASEDOWN,
+	CHASE_JUMP,
 	STOP,
 	ATTACK,
-	SKILL
+	SKILL,
+	DEAD
 };
 
 
