@@ -10,6 +10,7 @@
  *
  */
 #include "cocos2d.h"
+#include "Levels/Level.h"
 
 using namespace cocos2d;
 

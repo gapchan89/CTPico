@@ -12,6 +12,7 @@
 #include "cocos2d.h"
 #include "EnumCatState.h"
 #include "Character/Character.h"
+#include "Map/GameMap.h"
 
 using namespace cocos2d;
 
@@ -32,9 +33,10 @@ protected:
 
 	void loadSprite();
 	void useSkill(float timeDiff);
-	void attack(float timeDiff, Character* charRef);
-	void move(float timeDiff, GameMap* mapRef);
+	void attack(float timeDiff, Character* pCharRef);
+	void move(float timeDiff, GameMap* pMapRef);
 	void reduceCoolDown(float timeDiff);
+	void dying(float timeDiff);
 
 public:
 	static const int BASE_SPEED = 10; //x and y speed
@@ -47,8 +49,11 @@ public:
 	//===== CONSTRUCTOR =====
 	BaseCat(bool hasSkill);
 
+	//===== DESTRUCTOR =====
+	~BaseCat();
+
 	//===== FUNCTIONS =====
-	void update(float timeDiff, GameMap* mapRef, Character* charRef);
+	void update(float timeDiff, GameMap* pMapRef, Character* pCharRef);
 	void reduceHealth(int healthReduction);
 
 	CC_SYNTHESIZE(CCPoint, _nextPosition, NextPosition);

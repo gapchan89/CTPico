@@ -17,6 +17,7 @@ enum EnumCatState
 	CAT_STOP,
 	CAT_ATTACK,
 	CAT_SKILL,
+	CAT_DYING,
 	CAT_DEAD
 };
 

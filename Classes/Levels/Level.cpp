@@ -11,7 +11,7 @@
 
 //===== CONSTRUCTOR =====
 //for non-light load
-/*Level::Level(EnumLevelType levelMode,
+Level::Level(EnumLevelType levelMode,
 			 CatSpawnScript* pSpawnscript,
 			 CutScene*	pCutScene,
 			 bool levelCompleted,
@@ -20,12 +20,12 @@
 			 int minDifficulty,
 			 int maxDifficulty,
 			 int numOfObstacles,
-			 int mapWidth
+			 int mapWidth,
 			 CCString* pMapImageDirectory) 
 {
 	_lightLoad = false; //automatically false 
 	
-	_levelMode = levelMode;
+	_levelType = levelMode;
 	_pSpawnScript = pSpawnscript;
 	_pCutScene = pCutScene;
 	_levelCompleted = levelCompleted;
@@ -47,11 +47,11 @@ Level::Level(EnumLevelType levelMode,
 {
 	_lightLoad = true; //automatically true
 	
-	_levelMode = levelMode;
+	_levelType = levelMode;
 	_levelCompleted = levelCompleted;
 	_levelNumber = levelNumber;
 	_levelScore = levelScore;
-}*/
+}
 
 Level::Level()
 {
@@ -60,5 +60,9 @@ Level::Level()
 
 Level::~Level()
 {
+	delete _pMapImageDirectory;
+	delete _pSpawnScript;
 
+	//TODO: FIX IT FELIXXXXX
+	delete _pCutScene;
 }

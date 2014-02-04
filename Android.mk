@@ -12,11 +12,16 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/Cats/BaseCat.cpp \
 				   ../../Classes/Character/Character.cpp \
 				   ../../Classes/Character/CharacterAI.cpp \
+				   ../../Classes/Levels/CatSpawnScript.cpp \
+				   ../../Classes/Levels/CatSpawnSet.cpp \
+				   ../../Classes/Levels/Level.cpp \
+				   ../../Classes/Levels/LevelLoader.cpp \
+				   ../../Classes/Map/GameMap.cpp \
 				   ../../Classes/Supporting/CCBlade.cpp \
 				   ../../Classes/GameManager.cpp \
                    ../../Classes/HelloWorldScene.cpp \
 				   ../../Classes/NinjaCat.cpp \
-				   ../../Classes/Map/GameMap.cpp \
+				   
 			   
                    
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes                   

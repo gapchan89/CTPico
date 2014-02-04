@@ -9,7 +9,7 @@
 
 #include "BaseCat.h"
 
-//===== CONSTRUCTOR =====
+//========== CONSTRUCTOR ==========
 BaseCat::BaseCat(bool hasSkill)
 {
 	_speedX = _speedY = BaseCat::BASE_SPEED;
@@ -24,7 +24,16 @@ BaseCat::BaseCat(bool hasSkill)
 	loadSprite();
 }
 
-//===== FUNCTIONS =====
+//========== DESTRUCTOR ==========
+BaseCat::~BaseCat()
+{
+
+	delete _pRunningAnimate;
+
+}
+
+
+//========== FUNCTIONS ==========
 
 /*!
     @function loadSprite
@@ -60,23 +69,23 @@ void BaseCat::useSkill(float timeDiff)
     @function attack
     @param		timeDiff:float
 				time difference since the last call
-	@param		charRef:Character*
+	@param		pCharRef:Character*
 				reference to the character
     @result		moves the cat based on BASE_ATK_SPEED and multiplier.
     			will check for collision between the character and the cat.
     			if collided, reduces the character's health by BASE_DAMAGE and sets cat state to DEAD.
  */
-void BaseCat::attack(float timeDiff, Character* charRef)
+void BaseCat::attack(float timeDiff, Character* pCharRef)
 {
 	//move quickly towards the character's position (homing)
 	this->setPositionX(this->getPositionX() + (BASE_ATK_SPEED * timeDiff) * _speedMultiplier);
 	this->setPositionY(this->getPositionY() + (BASE_ATK_SPEED * timeDiff) * _speedMultiplier);
 
 	//if collided
-	if (this->getRect().intersectsRect(charRef->getRect()))
+	if (this->getRect().intersectsRect(pCharRef->getRect()))
 	{
 		//reduce character health
-		charRef->reduceHealth(BASE_DAMAGE);
+		pCharRef->reduceHealth(BASE_DAMAGE);
 		//delete this cat (mark for deletion)
 		_catState = CAT_DEAD;
 	}
@@ -86,12 +95,12 @@ void BaseCat::attack(float timeDiff, Character* charRef)
     @function move
     @param		timeDiff:float
 				time difference since the last call
-	@param		mapRef:GameMap*
+	@param		pMapRef:GameMap*
 				reference to the game map
     @result		moves the cat based on its current speed and multiplier.
     			cat will jump if it hits an obstacle
  */
-void BaseCat::move(float timeDiff, GameMap* mapRef)
+void BaseCat::move(float timeDiff, GameMap* pMapRef)
 {
 	//update position to move towards left of screen based on speed (LEFT SIDE, MINUS)
 	this->setPositionX(this->getPositionX() - (_speedX * timeDiff) * _speedMultiplier);
@@ -116,7 +125,7 @@ void BaseCat::move(float timeDiff, GameMap* mapRef)
 	}
 
 	//if collided with obstacle
-	if (mapRef->checkCollision(this->getPosition()))
+	if (pMapRef->checkCollision(this->getPosition()))
 		_catState = CAT_CHASE_JUMP;
 }
 
@@ -145,12 +154,25 @@ void BaseCat::reduceCoolDown(float timeDiff)
 }
 
 /*!
+    @function dying
+    @param		timeDiff:float
+				time difference between the last update call
+    @result		update the cat through dying animation / motion
+ */
+void BaseCat::dying(float timeDiff)
+{
+	//dying animation
+
+	_catState = CAT_DEAD;
+}
+
+/*!
     @function update
     @param		timeDiff:float
 				time difference between the last update call
     @result		base on the state the cat is in, call corresponding functions
  */
-void BaseCat::update(float timeDiff, GameMap* mapRef, Character* charRef)
+void BaseCat::update(float timeDiff, GameMap* pMapRef, Character* pCharRef)
 {
 	//get new state from AI if cat is not in mid air / jumping
 	/*if (!_catState.CHASE_JUMP)
@@ -163,14 +185,19 @@ void BaseCat::update(float timeDiff, GameMap* mapRef, Character* charRef)
 	//act according to state
 	switch(_catState)
 	{
-		//cat dead
+		//cat going through dying animation
+		case CAT_DYING:
+			dying(timeDiff);
+			break;
+
+		//cat is dead
 		case CAT_DEAD:
 			return;
 
 		//move
 		case CAT_CHASE:
 		case CAT_CHASE_JUMP:
-			move(timeDiff, mapRef);
+			move(timeDiff, pMapRef);
 			break;
 
 		//stop
@@ -181,7 +208,7 @@ void BaseCat::update(float timeDiff, GameMap* mapRef, Character* charRef)
 
 		//attack
 		case CAT_ATTACK:
-			attack(timeDiff, charRef);
+			attack(timeDiff, pCharRef);
 			break;
 
 		//skill
@@ -207,7 +234,7 @@ void BaseCat::reduceHealth(int healthReduction)
 }
 
 
-//===== STATIC FUNCTIONS =====
+//========== STATIC FUNCTIONS ==========
 
 BaseCat* BaseCat::gameSpriteWithFrame(CCSpriteFrame *frame)
 {
@@ -246,7 +273,7 @@ CCSpriteFrame* BaseCat::createSpriteFrame()
 	return CCSpriteFrame::create("Game/Cats/punk cat.png", CCRect(0, 0,100,100) );
 }
 
-//===== GETTERS =====
+//========== GETTERS ==========
 
 EnumCatState BaseCat::getState()
 {
@@ -277,7 +304,7 @@ CCRect BaseCat::getRect()
 						this->getContentSize().height);
 }
 
-//===== SETTERS =====
+//========== SETTERS ==========
 void BaseCat::setSpeedMultiplier(float multiplier)
 {
 	_speedMultiplier = multiplier;
