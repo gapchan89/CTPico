@@ -15,7 +15,8 @@ enum EnumCharacterState
 	RUN,
 	RUNUP,
 	RUNDOWN,
-	STOP
+	STOP,
+	DEAD
 };
 
 

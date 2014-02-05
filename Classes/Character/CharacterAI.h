@@ -2,10 +2,12 @@
 #define __CHARACTERAI_H__
 
 #include "cocos2d.h"
+#include "Character.h"
+#include "Map/GameMap.h"
 
 using namespace cocos2d;
 
-class GameMap;
+class GameMap;		// Forward declaration
 class Character;
 
 class CharacterAI
@@ -21,6 +23,7 @@ private:
 
 public:
 	//===== CONSTRUCTOR =====
+	CharacterAI(); 	//Default constructor
 	CharacterAI(Character* character, GameMap* map);
 
 	//===== DESTRUCTOR =====
