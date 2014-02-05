@@ -3,44 +3,67 @@
 
 #include "cocos2d.h"
 #include "EnumCharacterState.h"
+#include "CharacterAI.h"
+#include "Map/GameMap.h"
 
 using namespace cocos2d;
 
-class GameMap;
-//class LevelMode; //TODO: Fix it Felix
+class GameMap;		// Forward declaration
+//class LevelMode; 	//TODO: Fix it Felix
 
 class Character : public CCSprite
 {
 private:
 
-	//AI					_charBaseAI;			// AI class to decide on actions
+	static const int 	BASE_SPEED = 10; 				// x and y speed
+	static const int 	BASE_HEALTH = 3;
+	static const int 	BASE_OBSTACLE_HIT_CHANCE = 10;	// %
+	static const int	BASE_IMMUNITY = 2000;			// ms
+	static const int 	DEFAULT_MOVED = 0;
+	static const int 	STOP_SPEED = 4; 				// rate at which character stops
+
+	static const float 	BASE_SPEED_MULITIPLIER = 1.0;
+
+	// SYNTHESIZE: _nextPosition, _vector, _touch, _speedX, _speedY, _obstacleHitChance, _charState, _speedMultiplier
+
+	CharacterAI*		_pCharBaseAI;			// AI class to decide on actions
 
 	CCSprite*			_pCharSprite;			// Sprite to store character's sprite sheet
 	CCAnimation*		_pCharAnimation;		// Animation for character
-	
-	int					_health;
-	int					_immunityDuration;
+	CCAnimate* 			_pRunningAnimate;
 
-	void				setupSprite();
+	int					_health;
+	float				_immunityDuration;		// Count down to 0 before being vulnerable
+
+	int					_maxMoveDistance;
+	int					_amountMoved;
+
+	void				loadSprite();
+	void				runUp(float timeDiff);
+	void				runDown(float timeDiff);
+	void				stop(float timeDiff);
+	bool				canMove(float moveAmount);
+	bool				isImmune();
 
 public:
 
 	//===== CONSTRUCTOR =====
-	Character(); //Default constructor, temp
+	Character(); 				//Default constructor, temp
 	Character(GameMap* map);
 
 	//===== DESTRUCTOR =====
 	~Character(void);
-	//Character* 				gameSpriteWithFrame(CCSpriteFrame *frame);
 	
-	//===== FUNCTIONS =====
+	//===== STATIC FUNCTIONS =====
 	static Character*		gameSpriteWithFile(const char* filename);
 	static Character* 		gameSpriteWithFrame(CCSpriteFrame *frame);
+	static CCSpriteFrame* 	createSpriteFrame();
+
+	//===== FUNCTIONS =====
 	CCRect 					getRect();
 	virtual void 			setPosition(const CCPoint& pos);
-
 	//void 					setupAI(LevelMode levelMode);	// Choose which AI to set up based on level mode
-	bool					reduceHealth(int health);		// Reduce character's health, if < 0, character dies
+	void					reduceHealth(int health);		// Reduce character's health, if < 0, character dies
 	void					update(float timeDiff);			// Update the character's action
 
 	//===== GETTERS/SETTERS =====
@@ -51,8 +74,8 @@ public:
 	CC_SYNTHESIZE(int, _speedX, SpeedX);
 	CC_SYNTHESIZE(int, _speedY, SpeedY);
 	CC_SYNTHESIZE(int, _obstacleHitChance, ObstacleHitChance);
-
 	CC_SYNTHESIZE(EnumCharacterState, _charState, CharState);
+	CC_SYNTHESIZE(float, _speedMultiplier, SpeedMultiplier);
 
 	int						getHealth()				{	return _health;		}
 	int						getImmunityDuration()	{	return _immunityDuration;		}

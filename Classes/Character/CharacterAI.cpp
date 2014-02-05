@@ -1,13 +1,19 @@
-#include "CharacterAI.h"
+
 //#include "SimpleAudioEngine.h"
-#include "Map/GameMap.h"
 #include "Character.h"
+#include "Map/GameMap.h"
 #include "EnumCharacterState.h"
+#include "CharacterAI.h"
 
 using namespace cocos2d;
 //using namespace CocosDenshion;
 
 //===== CONSTRUCTOR =====
+CharacterAI::CharacterAI()
+{
+
+}
+
 CharacterAI::CharacterAI(Character* character, GameMap* map)
 {
 	_charReference = character;
@@ -33,7 +39,7 @@ void CharacterAI::update(float timeDiff)
 	int obstacleHitChance = arc4random() % 100;
 
 	// Update the amount the character has moved
-	_amountMoved += _charReference->getSpeedX();
+	_amountMoved += (_charReference->getSpeedX() * timeDiff) * _charReference->getSpeedMultiplier();
 
 	// Check for collision if character is not colliding
 	if( _charReference->getCharState() != STOP )
@@ -41,7 +47,7 @@ void CharacterAI::update(float timeDiff)
 		// If the character has hit an obstacle
 		if( obstacleHitChance < _charReference->getObstacleHitChance())
 		{
-			//_mapReference->getNextGrid(true, _charReference->getPositionY());
+			_mapReference->getNextGrid(_charReference->getPositionY(), true);
 			_charReference->setCharState(STOP);
 			_isStop = true;
 		}
@@ -56,8 +62,8 @@ void CharacterAI::update(float timeDiff)
 	if( isNewGrid() && !_isStop )
 	{
 		// Update Character's state
-		//EnumCharacterState _newCharState = _mapReference->getNextGrid(false, _charReference->getPositionY());
-		//_charReference->setCharState(_newCharState);
+		EnumCharacterState _newCharState = _mapReference->getNextGrid(_charReference->getPositionY(), false);
+		_charReference->setCharState(_newCharState);
 	}
 
 }
