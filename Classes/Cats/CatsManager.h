@@ -20,10 +20,16 @@ private:
 	int 		_levelType;
 	CCArray* 	_cats;
 	CatSpawnScript* _pSpawnScript;
-	CatSpawnScript* _pDirectorSpawnScript; //for ai director insertion
+	CCArray* 		_pDirectorSpawnSets; //for ai director insertion
 
+
+	void removeDeadCats();
+	void updateAllCats(float timeDiff);
 	void runSpawnScript(float timeDiff);
-	void runDirectorSpawnScript(float timeDiff);
+	void runDirectorSpawnSets(float timeDiff);
+	void createCat(int catType);
+
+
 
 public:
 	//========== CONSTRUCTOR ==========
