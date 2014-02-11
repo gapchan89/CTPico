@@ -8,6 +8,7 @@
 #include "Levels/CatSpawnScript.h"
 #include "Levels/CatSpawnSet.h"
 #include "Cats/BaseCat.h"
+#include "Cats/EnumCatType.h"
 #include "EnumCatState.h"
 #include "GameManager.h"
 
@@ -27,7 +28,7 @@ private:
 	void updateAllCats(float timeDiff);
 	void runSpawnScript(float timeDiff);
 	void runDirectorSpawnSets(float timeDiff);
-	void createCat(int catType);
+	BaseCat* createCat(int catType);
 
 
 
