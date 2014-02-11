@@ -8,7 +8,7 @@ using namespace cocos2d;
 //===== CONSTRUCTOR =====
 Character::Character()
 {
-
+	initVariables();
 }
 
 Character::Character(GameMap* map)
@@ -16,22 +16,25 @@ Character::Character(GameMap* map)
 	// SYNTHESIZE: _nextPosition, _vector, _touch, _speedX, _speedY, _obstacleHitChance, _charState, _speedMultiplier
 
 	_maxMoveDistance = map->getPixelsPerGrid();
+	
+	initVariables();
+
+	//setupAI();
+	_pCharBaseAI = new CharacterAI(this, map);		// AI class to decide on actions
+}
+
+void Character::initVariables()
+{
 	_amountMoved = DEFAULT_MOVED;
 
 	_health = BASE_HEALTH;
 	_immunityDuration = 0;
-	
+
 	setSpeedX(BASE_SPEED);
 	setSpeedY(BASE_SPEED);
 	setObstacleHitChance(BASE_OBSTACLE_HIT_CHANCE);
 	setCharState(RUN);
 	setSpeedMultiplier(BASE_SPEED_MULITIPLIER);
-
-	//load sprites and animation
-	loadSprite();
-
-	//setupAI();
-	_pCharBaseAI = new CharacterAI(this, map);		// AI class to decide on actions
 }
 
 //===== DESTRUCTOR =====
@@ -41,9 +44,9 @@ Character::~Character(void)
 }
 
 //===== FUNCTIONS =====
-Character* Character::gameSpriteWithFrame(CCSpriteFrame *frame)
+Character* Character::gameSpriteWithFrame(CCSpriteFrame *frame, GameMap* map)
 {
-	Character *character = new Character();
+	Character *character = new Character(map);
 
 	if( character && character->initWithSpriteFrame(frame) )
 	{
@@ -56,9 +59,9 @@ Character* Character::gameSpriteWithFrame(CCSpriteFrame *frame)
 	return NULL;
 }
 
-Character* Character::gameSpriteWithFile(const char* filename)
+Character* Character::gameSpriteWithFile(const char* filename, GameMap* map)
 {
-	Character *character = new Character();
+	Character *character = new Character(map);
 
 	if( character && character->initWithFile(filename))
 	{
@@ -76,7 +79,7 @@ Character* Character::gameSpriteWithFile(const char* filename)
  */
 CCSpriteFrame* Character::createSpriteFrame()
 {
-	return CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(0, 0,100,100) );
+	return CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(0, 100,100,100) );
 }
 
 void Character::loadSprite()
@@ -87,7 +90,7 @@ void Character::loadSprite()
 	//load the frames of animation
 	for (int i = 0; i < 4; i++)
 	{
-		CCSpriteFrame *frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(i*100, 0, 100, 100));
+		CCSpriteFrame *frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(i*100, 100, 100, 100));
 		runningAnimation->addSpriteFrame(frame);
 	}
 	//setup animation properties
@@ -240,7 +243,7 @@ void Character::update(float timeDiff)
 	{
 		// play run animation
 		case RUN:
-			break;
+			return;
 
 		// Run up 1 grid
 		case RUNUP:

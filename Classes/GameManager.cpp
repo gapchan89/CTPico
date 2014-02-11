@@ -7,6 +7,8 @@
 #include "Character/Character.h"
 #include "Map/GameMap.h"
 
+#include "Cats/BaseCat.h"
+
 using namespace cocos2d;
 using namespace CocosDenshion;
 
@@ -96,8 +98,9 @@ void GameManager::loadGame()
 
 	//================ Character =================
 	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(0,100,100,100) );
-	myCharacter = Character::gameSpriteWithFrame(frame);
-	this->addChild(myCharacter,1);
+	myCharacter = Character::gameSpriteWithFrame(frame, myMap);
+	myCharacter->setPosition(ccp(size.width*0.5, size.height/2));
+	this->addChild(myCharacter, 1);
 
 	//============= Cats =============== to be changed to catsmanager
 	myCats = new CCArray;

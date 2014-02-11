@@ -15,7 +15,7 @@ class Character : public CCSprite
 {
 private:
 
-	static const int 	BASE_SPEED = 10; 				// x and y speed
+	static const int 	BASE_SPEED = 15; 				// x and y speed
 	static const int 	BASE_HEALTH = 3;
 	static const int 	BASE_OBSTACLE_HIT_CHANCE = 10;	// %
 	static const int	BASE_IMMUNITY = 2000;			// ms
@@ -38,6 +38,7 @@ private:
 	int					_maxMoveDistance;
 	int					_amountMoved;
 
+	void				initVariables();
 	void				loadSprite();
 	void				runUp(float timeDiff);
 	void				runDown(float timeDiff);
@@ -55,8 +56,8 @@ public:
 	~Character(void);
 	
 	//===== STATIC FUNCTIONS =====
-	static Character*		gameSpriteWithFile(const char* filename);
-	static Character* 		gameSpriteWithFrame(CCSpriteFrame *frame);
+	static Character*		gameSpriteWithFile(const char* filename, GameMap* map);
+	static Character* 		gameSpriteWithFrame(CCSpriteFrame *frame, GameMap* map);
 	static CCSpriteFrame* 	createSpriteFrame();
 
 	//===== FUNCTIONS =====
