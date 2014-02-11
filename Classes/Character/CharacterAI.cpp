@@ -37,6 +37,7 @@ void CharacterAI::update(float timeDiff)
 
 	// Random value to determine obstacle hit chance
 	int obstacleHitChance = arc4random() % 100;
+	obstacleHitChance = 100;
 
 	// Update the amount the character has moved
 	_amountMoved += (_charReference->getSpeedX() * timeDiff) * _charReference->getSpeedMultiplier();
