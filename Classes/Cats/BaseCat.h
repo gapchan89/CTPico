@@ -47,7 +47,7 @@ public:
 	static const int BASE_DAMAGE = 1;
 
 	//===== CONSTRUCTOR =====
-	BaseCat(bool hasSkill);
+	BaseCat(bool hasSkill = false);
 
 	//===== DESTRUCTOR =====
 	~BaseCat();
