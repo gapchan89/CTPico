@@ -41,16 +41,17 @@ CatsManager::~CatsManager()
 //========== FUNCTIONS ==========
 void CatsManager::update(float timeDiff)
 {
-	//check spawn script
-	runSpawnScript(timeDiff);
-	//check additional spawn script
-	runDirectorSpawnSets(timeDiff);
-
-	//update all cats in the game
-	updateAllCats(timeDiff);
 	//remove cats that are dead / marked for deletion
 	removeDeadCats();
 
+	//update all cats in the game
+	updateAllCats(timeDiff);
+
+	//check spawn script
+	runSpawnScript(timeDiff);
+
+	//check additional spawn script
+	runDirectorSpawnSets(timeDiff);
 
 }
 
@@ -89,14 +90,18 @@ void CatsManager::runSpawnScript(float timeDiff)
 	//retrieve array of cat types to be added if any
 	CCArray* pCatTypesToSpawn = _pSpawnScript->updateAndCheckForSpawns(timeDiff);;
 
-	//add cats into the game
+	//loop through all new cats to spawn into the game
 	CCObject* catType = 0;
 	CCARRAY_FOREACH(pCatTypesToSpawn, catType)
 	{
 		CCInteger* catTypeInt = dynamic_cast<CCInteger*>(catType);
-		createCat(catTypeInt->getValue());
+		//create cat
+		BaseCat* newCat = createCat(catTypeInt->getValue());
 
-		//clean up
+		//add to the game
+		_cats->addObject(newCat);
+
+		//clean up the integer array
 		catTypeInt->release();
 		delete catTypeInt;
 	}
@@ -111,10 +116,42 @@ void CatsManager::runDirectorSpawnSets(float timeDiff)
 
 }
 
-void CatsManager::createCat(int catType)
+BaseCat* CatsManager::createCat(int catType)
 {
 	//TODO:
 	//create the cat
+	BaseCat* cat;
+	switch (catType)
+	{
+		case BOUNCE_CAT:
+		break;
+
+		case COWBOY_CAT:
+		break;
+
+		case FAT_CAT:
+		break;
+
+		case NINJA_CAT:
+		break;
+
+		case OLYMPIC_CAT:
+		break;
+
+		case PEW_CAT:
+		break;
+
+		case PUNK_CAT:
+		break;
+
+		case WITCH_CAT:
+		break;
+
+		default: //BASE_CAT
+			cat = new BaseCat();
+			break;
+	}
+	return cat;
 }
 
 void CatsManager::setLevelSpawnScript(CatSpawnScript* pCatSpawnScript)
