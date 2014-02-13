@@ -20,7 +20,6 @@ GameMap::GameMap(CCString* pMapImageDirectory, GameManager* screenHolder)
 	_screenSize = CCDirector::sharedDirector()->getWinSize();
 
 	//calculate scale factor for the images
-	//Scale factor will be adjusted again when loading BG
 	_scaleFactor = _screenSize.width / BG_IMAGE_WIDTH;
 
 	//calculate the number of pixels per grid (int)
@@ -68,18 +67,16 @@ void GameMap::setupObstacleImage()
  */
 void GameMap::setupMapImage(CCString* pMapImageDirectory)
 {
-	//loading background images and add to screen holder
-	//TODO: check on directory name and directory name + 1
-	_pBgSprite1 = CCSprite::create(pMapImageDirectory->getCString());
-
-	//Adjust scale factor based on image height
-	_scaleFactor = _screenSize.height / _pBgSprite1->boundingBox().size.height;
+		//actual width
 	int imageWidth = BG_IMAGE_WIDTH * _scaleFactor;
+
 	//calculate start and end position of background image
 	_bgStartPos = _screenSize.width - imageWidth - imageWidth/2;
 	_bgEndPos = _screenSize.width + imageWidth/2;
-	//end adjust scale factor
 
+	//loading background images and add to screen holder
+	//TODO: check on directory name and directory name + 1
+	_pBgSprite1 = CCSprite::create(pMapImageDirectory->getCString());
 	_pBgSprite1->setPosition( ccp( _screenSize.width - imageWidth/2, _screenSize.height/2) ); //first image start within screen
 	_pBgSprite1->setScale(_scaleFactor);
 	_pBgSprite1->setTag(BG_IMAGE_TAG);
@@ -88,8 +85,6 @@ void GameMap::setupMapImage(CCString* pMapImageDirectory)
 	_pBgSprite2->setPosition( ccp( _bgStartPos , _screenSize.height/2) ); //second image start outside of screen
 	_pBgSprite2->setScale(_scaleFactor);
 	_pBgSprite2->setTag(BG_IMAGE_TAG + 1);
-
-
 }
 
 bool GameMap::checkCollision(CCPoint point)

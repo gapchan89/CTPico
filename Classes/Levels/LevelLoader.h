@@ -10,8 +10,7 @@
  *
  */
 #include "cocos2d.h"
-
-class Level;
+#include "Levels/Level.h"
 
 using namespace cocos2d;
 
@@ -26,10 +25,11 @@ public:
 	LevelLoader();
 
 	//===== FUNCTIONS =====
-	Level** getLevelList();
-	Level* getLevel(int levelNumber);
+	Level* getLevelList();
+	Level getLevel(int levelNumber);
 	void setLevelScore(int levelNumber, int score);
 	void setLevelCompleted(int levelNumber, bool completed);
+
 
 	//===== DESTRUCTOR =====
 	~LevelLoader();
