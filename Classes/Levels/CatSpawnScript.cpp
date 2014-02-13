@@ -10,80 +10,55 @@
 #include "CatSpawnScript.h"
 
 //===== CONSTRUCTOR =====
-CatSpawnScript::CatSpawnScript(CCArray* pSpawnSets)
+CatSpawnScript::CatSpawnScript(int totalNumSets, CatSpawnSet** ppSpawnSets)
 {
-	_currentSet = 0;
-	_prespawnTimer = 0;
-
+	_currentSet = -1;
+	_totalNumSets = totalNumSets;
+	
 	//initialize array if none given
-	if (pSpawnSets == 0)
-		_pSpawnSets = new CCArray();
+	if (ppSpawnSets == 0)
+		_ppSpawnSets = new CatSpawnSet*[totalNumSets];
 	else
-		_pSpawnSets = pSpawnSets;
+		_ppSpawnSets = ppSpawnSets;
 }
 
 //===== DESTRUCTOR =====
 CatSpawnScript::~CatSpawnScript()
 {
-	CCObject* catSpawnSet = 0;
-	CCARRAY_FOREACH(_pSpawnSets, catSpawnSet)
-	{
-		CatSpawnSet* pSpawnSet = dynamic_cast<CatSpawnSet*>(catSpawnSet);
-		delete pSpawnSet;
-	}
+	for (int i = 0; i < _totalNumSets; i++)
+		delete _ppSpawnSets[i];
 
-	_pSpawnSets->release();
-	delete _pSpawnSets;
-}
-
-
-//===== FUNCTIONS =====
-/*!
-    @function updateAndCheckForSpawns
-    @param		timeDiff:float
-				time difference since the last call
-    @result		returns a CCArray of CCInteger, each representing a cat type to spawn
- */
-CCArray* CatSpawnScript::updateAndCheckForSpawns(float timeDiff)
-{
-	_prespawnTimer -= timeDiff * 1000;
-
-	//counts prespawn delay and decides when to move to next set
-	while (_prespawnTimer <= 0 && _currentSet + 1 < _pSpawnSets->count())
-	{
-		_currentSet++;
-		//retrieve next set
-		CatSpawnSet* pSpawnSet = dynamic_cast<CatSpawnSet*>(_pSpawnSets->objectAtIndex(_currentSet));
-		//get the prespawn timer
-		_prespawnTimer = pSpawnSet->getPreSpawnDelay();
-	}
-
-
-	CCArray* newSpawnsInt = new CCArray();
-
-	//loop through all sets to check if need to spawn new cat
-	//loop through all the sets till current set
-	for (int i = 0; i < _currentSet; i++)
-	{
-		CatSpawnSet* pSpawnSet = dynamic_cast<CatSpawnSet*>(_pSpawnSets->objectAtIndex(i));
-		//reduce spawn timer and check if ready to spawn
-		if (pSpawnSet->reduceSpawnTimer(timeDiff*1000))
-			//create a new cat and add to spawn list
-			newSpawnsInt->addObject( new CCInteger(pSpawnSet->getTypeOfCat()));
-	}
-
-	return newSpawnsInt;
+	delete[] _ppSpawnSets;
 }
 
 //===== SETTERS =====
-/*!
-    @function addSpawnSet
-    @param		pNewSet:CatSpawnSet*
-				new set to add into this script
-    @result		adds the CatSpawnSet to the end of this script
- */
-void CatSpawnScript::addSpawnSet(CatSpawnSet* pNewSet)
+void CatSpawnScript::setSpawnSet(CatSpawnSet* pNewSet, int index)
 {
-	_pSpawnSets->addObject(pNewSet);
+	if (index >= 0 && index < _totalNumSets)
+		_ppSpawnSets[index] = pNewSet;
 }
 
+//===== GETTERS =====
+CatSpawnSet* CatSpawnScript::getNextSet()
+{	
+	if (_currentSet + 1 < _totalNumSets)
+		return _ppSpawnSets[++_currentSet];
+	
+	return 0;
+}
+
+CatSpawnSet* CatSpawnScript::getCurrentSet()
+{
+	if (_currentSet >= 0 && _currentSet < _totalNumSets)
+		return _ppSpawnSets[_currentSet];
+	
+	return 0;
+}
+
+CatSpawnSet* CatSpawnScript::getSet(int index)
+{
+	if (index >= 0 && index < _totalNumSets)
+		return _ppSpawnSets[index];
+	
+	return 0;
+}

@@ -14,7 +14,7 @@ CatSpawnSet::CatSpawnSet(int typeOfCat, int spawnInterval, int numberToSpawn, in
 {
 	_typeOfCat = typeOfCat;
 	_spawnInterval = spawnInterval;
-	_spawnTimer = 0;
+	_spawnTimer = spawnInterval;
 	_prespawnDelay = prespawnDelay;
 	_numberToSpawn = numberToSpawn;
 }
@@ -35,9 +35,7 @@ bool CatSpawnSet::reduceSpawnTimer(int timeLapse)
 	if (_numberToSpawn <= 0)
 		return false;
 	
-	//first spawn check
-	if (_spawnTimer != 0)
-		_spawnTimer -= timeLapse;
+	_spawnTimer -= timeLapse;
 	
 	//not time to spawn yet
 	if (_spawnTimer > 0)

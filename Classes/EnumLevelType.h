@@ -12,8 +12,8 @@
 
 enum EnumLevelType 
 {
-	ESCAPE,
-	DEFENSE
+	eESCAPE = 0,
+	eDEFENSE
 };
 
 #endif

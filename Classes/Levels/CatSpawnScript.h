@@ -8,33 +8,31 @@
  */
 
 #include "CatSpawnSet.h"
-#include "Cats/BaseCat.h"
-#include "cocos2d.h"
 
 #ifndef _CAT_SPAWN_SCRIPT_H_
 #define _CAT_SPAWN_SCRIPT_H_
 
-using namespace cocos2d;
-
 class CatSpawnScript 
 {
 private:
-	CCArray* _pSpawnSets;
-	int		 _currentSet, _prespawnTimer;
-
+	CatSpawnSet**	_ppSpawnSets;
+	int				_currentSet, _totalNumSets;
 
 public:
 	//===== CONSTRUCTOR =====
-	CatSpawnScript(CCArray* pSpawnSets=0);
+	CatSpawnScript(int totalNumSets, CatSpawnSet** ppSpawnSets = 0);
 	
 	//===== DESTRUCTOR =====
 	~CatSpawnScript();
 
-	//===== FUNCTIONS =====
-	CCArray* updateAndCheckForSpawns(float timeDiff);
-
 	//===== SETTERS =====
-	void addSpawnSet(CatSpawnSet* pNewSet);
+	void setSpawnSet(CatSpawnSet* pNewSet, int index);
+	
+	//===== GETTERS =====
+	CatSpawnSet* getNextSet();
+	CatSpawnSet* getCurrentSet();
+	CatSpawnSet* getSet(int index);
+	
 };
 
 #endif

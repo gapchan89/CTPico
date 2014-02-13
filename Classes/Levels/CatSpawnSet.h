@@ -10,11 +10,7 @@
 #ifndef _CAT_SPAWN_SET_H_
 #define _CAT_SPAWN_SET_H_
 
-#include "cocos2d.h"
-
-using namespace cocos2d;
-
-class CatSpawnSet: public CCObject
+class CatSpawnSet 
 {
 private:
 	int	_typeOfCat,
@@ -32,7 +28,6 @@ public:
 	//===== GETTERS =====
 	int getTypeOfCat() { return _typeOfCat; };
 	int getNumberToSpawn() { return _numberToSpawn; };
-	int getPreSpawnDelay() { return _prespawnDelay; };
 };
 
 
