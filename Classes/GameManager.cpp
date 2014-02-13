@@ -6,8 +6,8 @@
 
 #include "Character/Character.h"
 #include "Map/GameMap.h"
-
-#include "Cats/BaseCat.h"
+#include "Levels/Level.h"
+#include "Levels/LevelLoader.h"
 
 using namespace cocos2d;
 using namespace CocosDenshion;
@@ -42,6 +42,11 @@ GameManager::~GameManager()
 
 	delete myMap;
 	myMap = NULL;
+
+	delete myLevelLoader;
+	myLevelLoader = NULL;
+
+	//TODO: delete character etc
 }
 
 // on "init" you need to initialize your instance
@@ -54,32 +59,14 @@ bool GameManager::init()
         return false;
     }
 
-    //Enable touch
+    //Enable touch and accelerometer
     this->setTouchEnabled(true);
     this->setAccelerometerEnabled(true);
 
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    CCMenuItemImage *pCloseItem = CCMenuItemImage::create(
-                                        "CloseNormal.png",
-                                        "CloseSelected.png",
-                                        this,
-                                        menu_selector(GameManager::menuCloseCallback) );
-    pCloseItem->setPosition( ccp(CCDirector::sharedDirector()->getWinSize().width - 20, 20) );
-
-    // create menu, it's an autorelease object TEMP ITEM
-    CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
-    pMenu->setPosition( CCPointZero );
-    this->addChild(pMenu, 1);
-
-    // ask director the window size
-    //CCSize size = CCDirector::sharedDirector()->getWinSize();
-
+    //Setup game level data
     loadGame();
 
+    //Setup Update functions
     this->schedule(schedule_selector(GameManager::addCat), 1.0f);
     this->setKeypadEnabled(true); //enable for backkey button
     this->scheduleUpdate();
@@ -87,31 +74,55 @@ bool GameManager::init()
     return true;
 }
 
-
-
 void GameManager::loadGame()
 {
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
+	//================ Levels ==============================================
+	myLevelLoader = new LevelLoader();
+	//Level **lightlevels = myLevelLoader->getLevelList(); //For Stage Select
+	Level* leveldata = myLevelLoader->getLevel(1);
+
 	//================ MAP ====================
-	myMap = new GameMap(CCString::create("Game/Background/bg-01.png"), this);
+	myMap = new GameMap(CCString::create("Game/Background/BG City 1.png"), this);
 
 	//================ Character =================
 	CCSpriteFrame *frame = CCSpriteFrame::create("Game/Character/human-spritesheet.png", CCRect(0,100,100,100) );
-	myCharacter = Character::gameSpriteWithFrame(frame, myMap);
-	myCharacter->setPosition(ccp(size.width*0.5, size.height/2));
-	this->addChild(myCharacter, 1);
+	myCharacter = Character::gameSpriteWithFrame(frame);
+	this->addChild(myCharacter,1);
 
 	//============= Cats =============== to be changed to catsmanager
 	myCats = new CCArray;
 
 	//============ UI ================== have to put this else where i think
 	//Scrolling background images variables (Image width = 950)
-	bgScale = size.width / 950; // temp value for uiSprite value
+	/*bgScale = size.width / 950; // temp value for uiSprite value
 	CCSprite * uiSprite = CCSprite::create("Game/UI/game ui.png");
 	uiSprite->setScale(bgScale);
 	uiSprite->setPosition(ccp(size.width/2, size.height/2));
-	this->addChild(uiSprite, 10);
+	this->addChild(uiSprite, 10);*/
+
+	float UIscalefactor = myMap->getScaleFactor();
+
+	//HP lives
+
+
+	//Skill bar
+	CCSprite * skillbarSprite = CCSprite::create("Game/UI/[UI] Skill Bar - Base.png");
+	skillbarSprite->setScale(UIscalefactor);
+	skillbarSprite->setPosition(ccp(size.width/2 + (245*UIscalefactor) ,size.height/2 - (258*UIscalefactor)));
+	//skillbarSprite->setTag(950);
+	this->addChild(skillbarSprite,11);
+
+	//Pause button
+	CCSprite * pauseButtonSprite = CCSprite::create("Game/UI/[Button] Pause - Normal.png");
+	CCSprite * pauseButtonSpritePressed = CCSprite::create("Game/UI/[Button] Pause - Pressed.png");
+	CCMenuItemSprite* pauseButton = CCMenuItemSprite::create(pauseButtonSprite,pauseButtonSpritePressed,this,menu_selector(GameManager::pauseButtonPressed));
+	pauseButton->setScale(UIscalefactor);
+	pauseButton->setPosition(ccp(size.width/2 + (530*UIscalefactor),size.height/2 + (280*UIscalefactor)));
+    CCMenu* gamemenu = CCMenu::create(pauseButton, NULL);
+    gamemenu->setPosition(0,0);
+	this->addChild(gamemenu,11);
 
 	skillOn = false;
 	CCSprite * metSprite = CCSprite::create("Game/UI/meteor-01.png");
@@ -133,7 +144,7 @@ void GameManager::loadGame()
 void GameManager::update(float dt)
 {
 	//============= CHARACTER =================
-	myCharacter->update(dt);
+	//myCharacter->update(dt);
 
 	//============= MAP =====================
 	myMap->update(dt);
@@ -488,15 +499,6 @@ void GameManager::didAccelerate(cocos2d::CCAcceleration* pAccelerationValue)
       //sprite->setPosition(ccp(sprite->getPosition().x+pAccelerationValue->x*3,sprite->getPosition().y));    //I have not tested it but to move sprite horizontally with some speed like x*6..you can change it as accordingly..
 }
 
-void GameManager::menuCloseCallback(CCObject* pSender)
-{
-    CCDirector::sharedDirector()->end();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
-}
-
 void GameManager::addCat()
 {
 	//========== ANIMATE IMAGE ==========
@@ -565,6 +567,11 @@ void GameManager::spriteMoveFinished(CCNode* sender)
   this->removeChild(sprite, true);
 }
 
+//===================UI Buttons===============
+void GameManager::pauseButtonPressed()
+{
+
+}
 void GameManager::keyBackClicked()
 {
 	CCDirector::sharedDirector()->end();

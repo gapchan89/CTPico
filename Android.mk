@@ -14,6 +14,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/Character/CharacterAI.cpp \
 				   ../../Classes/Levels/CatSpawnScript.cpp \
 				   ../../Classes/Levels/CatSpawnSet.cpp \
+				   ../../Classes/Levels/CutScene.cpp \
 				   ../../Classes/Levels/Level.cpp \
 				   ../../Classes/Levels/LevelLoader.cpp \
 				   ../../Classes/Map/GameMap.cpp \

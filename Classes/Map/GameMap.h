@@ -57,7 +57,7 @@ public:
 	
 
 	//===== GETTERS =====
-	float getScaleFactor(){return _scaleFactor;}
+	float getScaleFactor() {return _scaleFactor;}
 	int getPixelsPerGrid() {return _pixelsPerGrid; }
 };
 

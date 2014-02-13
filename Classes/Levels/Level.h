@@ -10,20 +10,17 @@
  *
  */
 #include "cocos2d.h"
-#include "EnumLevelType.h"
-#include "Levels/CatSpawnScript.h"
 
 using namespace cocos2d;
 
-//TODO: FIX IT FELIXXXXXXXXX
+class CatSpawnScript;
 class CutScene;
-
 
 class Level
 {
 
 private:
-	EnumLevelType	_levelType;
+	int	_levelType;
 	CatSpawnScript* _pSpawnScript;
 	CutScene*		_pCutScene;
 	bool			_levelCompleted,
@@ -37,7 +34,7 @@ public:
 	//===== CONSTRUCTOR =====
 	Level();
 	//for non-light load
-	Level(	EnumLevelType	levelType,
+	Level(	int	levelType,
 			CatSpawnScript* pSpawnscript,
 			CutScene* 		pCutScene,
 			bool 			levelCompleted,
@@ -50,7 +47,7 @@ public:
 			CCString* 		pMapImageDirectory);
 
 	//light load
-	Level(	EnumLevelType levelType,
+	Level(	int levelType,
 			bool levelCompleted,
 			int levelNumber,
 			int levelScore);
@@ -59,14 +56,14 @@ public:
 	~Level();
 
 	//===== SETTERS =====
-	void setlevelType(EnumLevelType levelType) { _levelType = levelType; }
+	void setlevelType(int levelType) { _levelType = levelType; }
 	void setSpawnScript(CatSpawnScript* pSpawnScript) { _pSpawnScript = pSpawnScript; }
 	void setCutScene(CutScene* pCutScene) { _pCutScene = pCutScene; }
 	void setLevelCompleted(bool levelCompleted) { _levelCompleted = levelCompleted; }
 	void setLightLoad(bool lightLoad) { _lightLoad = lightLoad; }
 
 	//===== GETTERS =====
-	EnumLevelType getLevelType() { return _levelType; }
+	int getLevelType() { return _levelType; }
 	CatSpawnScript* getSpawnScript() { return _pSpawnScript; }
 	CutScene* getCutScene() { return _pCutScene; }
 

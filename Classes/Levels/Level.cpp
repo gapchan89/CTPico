@@ -8,10 +8,13 @@
  */
 
 #include "Level.h"
+#include "CutScene.h"
+#include "CatSpawnScript.h"
+#include "EnumLevelType.h"
 
 //===== CONSTRUCTOR =====
 //for non-light load
-Level::Level(EnumLevelType levelMode,
+Level::Level(int levelMode,
 			 CatSpawnScript* pSpawnscript,
 			 CutScene*	pCutScene,
 			 bool levelCompleted,
@@ -40,7 +43,7 @@ Level::Level(EnumLevelType levelMode,
 }
 
 //light load
-Level::Level(EnumLevelType levelMode,
+Level::Level(int levelMode,
 			 bool levelCompleted,
 			 int levelNumber,
 			 int levelScore)

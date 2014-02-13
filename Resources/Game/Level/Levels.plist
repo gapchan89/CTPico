@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>levelType</key>
+		<integer>0</integer>
+		<key>spawnScript</key>
+		<array>
+			<dict>
+				<key>typeOfCat</key>
+				<integer>1</integer>
+				<key>spawnInterval</key>
+				<integer>5</integer>
+				<key>spawnTimer</key>
+				<integer>5</integer>
+				<key>prespawnDelay</key>
+				<integer>5</integer>
+				<key>numberToSpawn</key>
+				<integer>3</integer>
+			</dict>
+		</array>
+		<key>cutScene</key>
+		<string>cutscene</string>
+		<key>levelNumber</key>
+		<integer>1</integer>
+		<key>levelCompleted</key>
+		<false/>
+		<key>levelScore</key>
+		<integer>9999</integer>
+		<key>maxDifficulty</key>
+		<integer>5</integer>
+		<key>minDifficulty</key>
+		<integer>2</integer>
+		<key>numOfObstacles</key>
+		<integer>2</integer>
+		<key>mapWidth</key>
+		<integer>0</integer>
+	</dict>
+</array>
+</plist>
